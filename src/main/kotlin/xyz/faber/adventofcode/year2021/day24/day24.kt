@@ -2,6 +2,8 @@ package xyz.faber.adventofcode.year2021.day24
 
 import com.microsoft.z3.BitVecExpr
 import com.microsoft.z3.Context
+import xyz.faber.adventofcode.util.AdventRunner
+import xyz.faber.adventofcode.util.AdventSolution
 import xyz.faber.adventofcode.util.getInputFromLines
 import java.util.*
 
@@ -11,9 +13,7 @@ val zeroAndOne = setOf(0, 1)
 val inputs = mutableMapOf<Int, Int>()
 
 
-class Day24 {
-    val input = getInputFromLines(2021, 24)
-
+class Day24 : AdventSolution<String>() {
     fun runProgram(input: List<String>, number: Queue<Int>): Int {
         val program = input.map { it.split(" ") }
         var registers = mutableMapOf<String, Int>()
@@ -223,7 +223,7 @@ class Day24 {
         return runProgram(input, LinkedList(number.toList().map { it.toString().toInt() }))
     }
 
-    fun solve(start: String): String? {
+    fun solve(input: List<String>, start: String): String? {
         for (i in start.indices) {
             inputs[i] = start[i].toString().toInt()
         }
@@ -237,7 +237,7 @@ class Day24 {
         if (start.length == 14) return start
         println(start)
         for (j in 9 downTo 1) {
-            val res = solve(start + j)
+            val res = solve(input, start + j)
             if (res != null) {
                 return res
             }
@@ -245,7 +245,7 @@ class Day24 {
         return null
     }
 
-    fun solve2(start: String): String? {
+    fun solve2(input: List<String>, start: String): String? {
         for (i in start.indices) {
             inputs[i] = start[i].toString().toInt()
         }
@@ -259,7 +259,7 @@ class Day24 {
         if (start.length == 14) return start
         println(start)
         for (j in 1..9) {
-            val res = solve2(start + j)
+            val res = solve2(input, start + j)
             if (res != null) {
                 return res
             }
@@ -267,18 +267,16 @@ class Day24 {
         return null
     }
 
-    fun part1() {
-        val res = solve("")
-        println(res)
+    override fun part1(input: List<String>): String {
+        return solve(input, "")!!
     }
 
 
-    fun part2() {
-        val res = solve2("")
-        println(res)
+    override fun part2(input: List<String>): String {
+        return solve2(input, "")!!
     }
 
-    fun part1b() {
+    fun part1b(input: List<String>): String {
         val context = Context(mapOf("proof" to "true", "model" to "true"))
         val solver = context.mkOptimize()
         val solver2 = context.mkSolver()
@@ -301,23 +299,26 @@ class Day24 {
                 continue
             }
             val a = registers[inst[1][0]]!!
-            val b = registers[inst[2][0]]?:context.mkBV(inst[2].toInt(), 64)
+            val b = registers[inst[2][0]] ?: context.mkBV(inst[2].toInt(), 64)
             val c = context.mkBVConst("v_$i", 64)
             when (inst[0]) {
                 "add" -> {
                     solver.Add(context.mkEq(c, context.mkBVAdd(a, b)))
                     solver2.add(context.mkEq(c, context.mkBVAdd(a, b)))
                 }
+
                 "mul" -> {
                     solver.Add(context.mkEq(c, context.mkBVMul(a, b)))
                     solver2.add(context.mkEq(c, context.mkBVMul(a, b)))
                 }
+
                 "div" -> {
                     solver.Add(context.mkNot(context.mkEq(b, zero)))
                     solver2.add(context.mkNot(context.mkEq(b, zero)))
                     solver.Add(context.mkEq(c, context.mkBVSDiv(a, b)))
                     solver2.add(context.mkEq(c, context.mkBVSDiv(a, b)))
                 }
+
                 "mod" -> {
                     solver.Add(context.mkBVSGE(a, zero))
                     solver2.add(context.mkBVSGE(a, zero))
@@ -326,6 +327,7 @@ class Day24 {
                     solver.Add(context.mkEq(c, context.mkBVSRem(a, b)))
                     solver2.add(context.mkEq(c, context.mkBVSRem(a, b)))
                 }
+
                 "eql" -> {
                     solver.Add(context.mkEq(c, context.mkITE(context.mkEq(a, b), one, zero)))
                     solver2.add(context.mkEq(c, context.mkITE(context.mkEq(a, b), one, zero)))
@@ -338,7 +340,7 @@ class Day24 {
         solver2.add(context.mkEq(registers['z'], zero))
         println(solver)
         var toMax: BitVecExpr = zero
-        for(i in 0..13){
+        for (i in 0..13) {
             val d = digits[i]!!
             val expLong = Math.pow(10.0, 13.0 - i).toLong()
             val exp = context.mkBV(expLong, 64)!!
@@ -352,16 +354,12 @@ class Day24 {
         /*for (expr in solver2.unsatCore) {
             println(expr)
         }*/
-        println(solution.getValue())
+        return solution.getValue().toString()
 
 
     }
 }
 
 fun main(args: Array<String>) {
-    val d = Day24()
-
-    //d.part1()
-    //d.part2()
-    d.part1b()
+    AdventRunner(2021, 24, Day24()).run()
 }

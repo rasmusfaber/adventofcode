@@ -1,13 +1,9 @@
 package xyz.faber.adventofcode.year2021.day25
 
-import xyz.faber.adventofcode.util.XYMap
-import xyz.faber.adventofcode.util.getInputFromLines
-import xyz.faber.adventofcode.util.toXYMap
+import xyz.faber.adventofcode.util.*
 
-class Day25 {
-    val input = getInputFromLines(2021, 25)
-
-    fun part1() {
+class Day25: AdventSolution<Int>() {
+    override fun part1(input: List<String>): Int {
         var map = input.toXYMap()
         var steps = 0
         while (true) {
@@ -41,7 +37,7 @@ class Day25 {
             }
             steps++
             if (!moved) {
-                println(steps)
+                return steps
                 break
             }
             map = nextmap
@@ -55,8 +51,5 @@ class Day25 {
 }
 
 fun main(args: Array<String>) {
-    val d = Day25()
-
-    d.part1()
-    d.part2()
+    AdventRunner(2021, 25, Day25()).run()
 }

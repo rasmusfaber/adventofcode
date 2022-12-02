@@ -1,14 +1,11 @@
 package xyz.faber.adventofcode.year2022.day1
 
-import xyz.faber.adventofcode.util.getInput
-import xyz.faber.adventofcode.util.getInputFromLines
-import xyz.faber.adventofcode.util.split
+import xyz.faber.adventofcode.util.AdventRunner
+import xyz.faber.adventofcode.util.AdventSolution
 import xyz.faber.adventofcode.util.splitOnEmpty
 
-class Day1 {
-    val input = getInput(2022, 1).lines()
-
-    fun part1(input: List<String>) : Int {
+class Day1: AdventSolution<Int>() {
+    override fun part1(input: List<String>) : Int {
         return input
             .splitOnEmpty()
             .map { it
@@ -18,7 +15,7 @@ class Day1 {
             .max()
     }
 
-    fun part2(input: List<String>) : Int {
+    override fun part2(input: List<String>) : Int {
         return input
             .splitOnEmpty()
             .map { it
@@ -33,7 +30,5 @@ class Day1 {
 }
 
 fun main(args: Array<String>) {
-    val d = Day1()
-    println(d.part1(d.input))
-    println(d.part2(d.input))
+    AdventRunner(2022, 1, Day1()).run()
 }

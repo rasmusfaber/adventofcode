@@ -16,12 +16,11 @@ data class State(val map: CharArray) {
     }
 }
 
-class Day23 {
-    val input = getInputFromLines(2021, 23)
-        .map { it.padEnd(13, ' ') }
+class Day23 : AdventSolution<Int>() {
+    override fun transform(input: List<String>) = input.map { it.padEnd(13, ' ') }
 
     private class SearchStrategy(val initialMap: XYMap<Char>, val depth: Int) {
-        private val positions = (1..4).flatMap{ column-> (depth+1 downTo 2).map{y-> Pos(column*2+1,y)}}+(1..11).filter{it !in setOf(3,5,7,9)}.map{Pos(it,1)}
+        private val positions = (1..4).flatMap { column -> (depth + 1 downTo 2).map { y -> Pos(column * 2 + 1, y) } } + (1..11).filter { it !in setOf(3, 5, 7, 9) }.map { Pos(it, 1) }
         private val reverseTranslate = positions.mapIndexed { i, pos -> pos to i }.toMap()
         private val topology = initialMap.toGraph { it != '#' && it != ' ' }
         private val distances = positions.flatMap { p1 -> topology.getDistances(p1, positions, true).map { (reverseTranslate[p1]!! to reverseTranslate[it.key]!!) to it.value } }.toMap()
@@ -72,8 +71,8 @@ class Day23 {
                 val c = state.map[i]
                 if (c == '.') continue
                 val l = mutableListOf<Int>()
-                if (i <= 4*depth-1) {
-                    for (j in 4*depth..4*depth+6) {
+                if (i <= 4 * depth - 1) {
+                    for (j in 4 * depth..4 * depth + 6) {
                         val r = routes[i to j]!!
                         if (r.all { m[it] == '.' }) {
                             l.add(j)
@@ -141,30 +140,27 @@ class Day23 {
     }
 
 
-    fun part1() {
+    override fun part1(input: List<String>): Int {
         val initialmap = input.toXYMap()
         val strategy = SearchStrategy(initialmap, 2)
 
         val res = strategy.search()
-        strategy.print(res!!.path)
-        println(res!!.totalCost)
+        //strategy.print(res!!.path)
+        return res!!.totalCost
     }
 
-    fun part2() {
+    override fun part2(input: List<String>): Int {
         val initialmap = input.subList(0, 3)
             .plus("  #D#C#B#A#  ")
             .plus("  #D#B#A#C#  ")
             .plus(input.subList(3, 5)).toXYMap()
         val strategy = SearchStrategy(initialmap, 4)
         val res = strategy.search()
-        strategy.print(res!!.path)
-        println(res!!.totalCost)
+        //strategy.print(res!!.path)
+        return res!!.totalCost
     }
 }
 
 fun main(args: Array<String>) {
-    val d = Day23()
-
-    d.part1()
-    d.part2()
+    AdventRunner(2021, 23, Day23()).run()
 }
