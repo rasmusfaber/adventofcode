@@ -6,27 +6,28 @@ class Day2 {
     val input = getInputFromLines(2022, 2)
 
     fun part1() {
-        val res = input.map { it.split(" ").map { it[0] } }
-            .map { (ac, bc) ->
-                val a = ac - 'A'
-                val b = bc - 'X'
-                val score1 = b + 1
-                val score2 = if (a == b) 3 else if ((a + 1) % 3 == b) 6 else 0
+        val res = input
+            .map { it.split(" ").map { it[0] } }
+            .map { (a, b) -> a - 'A' to b - 'X' }
+            .map { (move1, move2) ->
+                val outcome = (move2 - move1 + 4) % 3
+                val score1 = move2 + 1
+                val score2 = outcome * 3
                 score1 + score2
             }.sum()
         println(res)
     }
 
     fun part2() {
-        val res = input.map { it.split(" ").map { it[0] } }
-            .map { (ac, cc) ->
-            val a = ac - 'A'
-            val c = cc - 'X'
-            val b = if (c == 0) (a + 2) % 3 else if (c == 1) a else (a + 1) % 3
-            val score1 = b + 1
-            val score2 = if (a == b) 3 else if ((a + 1) % 3 == b) 6 else 0
-            score1 + score2
-        }.sum()
+        val res = input
+            .map { it.split(" ").map { it[0] } }
+            .map { (a, c) -> a - 'A' to c - 'X' }
+            .map { (move1, outcome) ->
+                val move2 = (move1 + outcome + 2) % 3
+                val score1 = move2 + 1
+                val score2 = outcome * 3
+                score1 + score2
+            }.sum()
         println(res)
     }
 }
