@@ -11,9 +11,8 @@ class Day2 {
             .map { (a, b) -> a - 'A' to b - 'X' }
             .map { (move1, move2) ->
                 val outcome = (move2 - move1 + 1).mod(3)
-                val score1 = move2 + 1
-                val score2 = outcome * 3
-                score1 + score2
+
+                (move2 + 1) + 3 * outcome
             }.sum()
         println(res)
     }
@@ -24,9 +23,8 @@ class Day2 {
             .map { (a, c) -> a - 'A' to c - 'X' }
             .map { (move1, outcome) ->
                 val move2 = (move1 + outcome - 1).mod(3)
-                val score1 = move2 + 1
-                val score2 = outcome * 3
-                score1 + score2
+
+                (move2 + 1) + 3 * outcome
             }.sum()
         println(res)
     }
