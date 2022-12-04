@@ -2,18 +2,20 @@ package xyz.faber.adventofcode.util
 
 class AdventRunner<T>(val year: Int, val day: Int, val solution: BaseAdventSolution<T>) {
     fun run() {
-        val test = getTest(year, day)
+        val tests = getTests(year, day)
         val input = getInput(year, day)
-        if (test != null) {
-            println("Test data:")
-            run(solution, test)
+        println("Test data:")
+        tests.withIndex().forEach { (i, test) ->
+            try {
+                run(solution, test)
+            }catch(e: Exception){}
         }
         println("Real data:")
         run(solution, input)
     }
 
     private fun run(solution: BaseAdventSolution<T>, input: String) {
-        return when(solution){
+        return when (solution) {
             is AdventSolution<T> -> run(solution, input)
             is AdventSolutionWithTransform<T, *> -> run(solution, input)
         }
@@ -57,7 +59,7 @@ class AdventRunner<T>(val year: Int, val day: Int, val solution: BaseAdventSolut
 
 sealed interface BaseAdventSolution<T>
 
-abstract class AdventSolution<T>: BaseAdventSolution<T> {
+abstract class AdventSolution<T> : BaseAdventSolution<T> {
     open fun transform(input: String) = input
 
     open fun transform(input: List<String>) = input
@@ -103,7 +105,7 @@ abstract class AdventSolution<T>: BaseAdventSolution<T> {
     }
 }
 
-abstract class AdventSolutionWithTransform<T, I>: BaseAdventSolution<T> {
+abstract class AdventSolutionWithTransform<T, I> : BaseAdventSolution<T> {
     open fun transformLine(input: String): I? {
         return null
     }
