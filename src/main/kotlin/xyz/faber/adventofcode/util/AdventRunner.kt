@@ -1,6 +1,6 @@
 package xyz.faber.adventofcode.util
 
-class AdventRunner<T>(val year: Int, val day: Int, val solution: AdventSolution<T>) {
+class AdventRunner<T>(val year: Int, val day: Int, val solution: BaseAdventSolution<T>) {
     fun run() {
         val test = getTest(year, day)
         val input = getInput(year, day)
@@ -12,7 +12,14 @@ class AdventRunner<T>(val year: Int, val day: Int, val solution: AdventSolution<
         run(solution, input)
     }
 
-    fun run(solution: AdventSolution<T>, input: String) {
+    private fun run(solution: BaseAdventSolution<T>, input: String) {
+        return when(solution){
+            is AdventSolution<T> -> run(solution, input)
+            is AdventSolutionWithTransform<T, *> -> run(solution, input)
+        }
+    }
+
+    private fun run(solution: AdventSolution<T>, input: String) {
         val str = input.let { solution.transform(it) }
         tryRun("Part 1", str, solution::part1)
         tryRun("Part 2", str, solution::part2)
@@ -26,6 +33,20 @@ class AdventRunner<T>(val year: Int, val day: Int, val solution: AdventSolution<
         tryRun("Part 2", csv, solution::part2Csv)
     }
 
+    private fun <I> run(solution: AdventSolutionWithTransform<T, I>, input: String) {
+        val transformed = input.let { solution.transformAll(it) }
+        if (transformed != null) {
+            tryRun("Part 1", transformed, solution::part1)
+            tryRun("Part 2", transformed, solution::part2)
+        }
+
+        val lines: List<I> = input.lines().dropLastWhile { it.isBlank() }
+            .map { solution.transformLine(it) }
+            .filterNotNull()
+        tryRun("Part 1", lines, solution::part1)
+        tryRun("Part 2", lines, solution::part2)
+    }
+
     fun <I> tryRun(part: String, input: I, runFunc: (I) -> (T?)) {
         val res = runFunc(input)
         if (res != null) {
@@ -34,7 +55,9 @@ class AdventRunner<T>(val year: Int, val day: Int, val solution: AdventSolution<
     }
 }
 
-abstract class AdventSolution<T> {
+sealed interface BaseAdventSolution<T>
+
+abstract class AdventSolution<T>: BaseAdventSolution<T> {
     open fun transform(input: String) = input
 
     open fun transform(input: List<String>) = input
@@ -76,6 +99,34 @@ abstract class AdventSolution<T> {
     @Suppress("INAPPLICABLE_JVM_NAME")
     @JvmName("part2Ints")
     open fun part2(input: List<Int>): T? {
+        return null
+    }
+}
+
+abstract class AdventSolutionWithTransform<T, I>: BaseAdventSolution<T> {
+    open fun transformLine(input: String): I? {
+        return null
+    }
+
+    @Suppress("INAPPLICABLE_JVM_NAME")
+    @JvmName("transform3")
+    open fun transformAll(input: String): I? {
+        return null
+    }
+
+    open fun part1(input: I): T? {
+        return null
+    }
+
+    open fun part2(input: I): T? {
+        return null
+    }
+
+    open fun part1(input: List<I>): T? {
+        return null
+    }
+
+    open fun part2(input: List<I>): T? {
         return null
     }
 }
