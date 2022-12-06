@@ -8,7 +8,8 @@ class AdventRunner<T>(val year: Int, val day: Int, val solution: BaseAdventSolut
         tests.withIndex().forEach { (i, test) ->
             try {
                 run(solution, test)
-            }catch(e: Exception){}
+            } catch (e: Exception) {
+            }
         }
         println("Real data:")
         run(solution, input)
@@ -36,17 +37,31 @@ class AdventRunner<T>(val year: Int, val day: Int, val solution: BaseAdventSolut
     }
 
     private fun <I> run(solution: AdventSolutionWithTransform<T, I>, input: String) {
-        val transformed = input.let { solution.transformAll(it) }
+        var transformed = input.let { solution.transformAll(it) }
         if (transformed != null) {
             tryRun("Part 1", transformed, solution::part1)
+            transformed = input.let { solution.transformAll(it) }!!
             tryRun("Part 2", transformed, solution::part2)
         }
 
-        val lines: List<I> = input.lines().dropLastWhile { it.isBlank() }
+        val rawLines = input.lines().dropLastWhile { it.isBlank() }
+        var transformed2 = solution.transformAll(rawLines)
+        if (transformed2 != null) {
+            tryRun("Part 1", transformed2, solution::part1)
+            transformed2 = solution.transformAll(rawLines)!!
+            tryRun("Part 2", transformed2, solution::part2)
+        }
+
+        var lines = rawLines
             .map { solution.transformLine(it) }
             .filterNotNull()
-        tryRun("Part 1", lines, solution::part1)
-        tryRun("Part 2", lines, solution::part2)
+        if (lines.isNotEmpty()) {
+            tryRun("Part 1", lines, solution::part1)
+            lines = rawLines
+                .map { solution.transformLine(it) }
+                .filterNotNull()
+            tryRun("Part 2", lines, solution::part2)
+        }
     }
 
     fun <I> tryRun(part: String, input: I, runFunc: (I) -> (T?)) {
@@ -113,6 +128,10 @@ abstract class AdventSolutionWithTransform<T, I> : BaseAdventSolution<T> {
     @Suppress("INAPPLICABLE_JVM_NAME")
     @JvmName("transform3")
     open fun transformAll(input: String): I? {
+        return null
+    }
+
+    open fun transformAll(input: List<String>): I? {
         return null
     }
 

@@ -1,9 +1,9 @@
-package xyz.faber.adventofcode.year2022.dayN
+package xyz.faber.adventofcode.year2022.day7
 
 import xyz.faber.adventofcode.util.AdventRunner
 import xyz.faber.adventofcode.util.AdventSolution
 
-class DayN : AdventSolution<Int>() {
+class Day7 : AdventSolution<Int>() {
     override fun part1(input: List<String>): Int {
         return 0
     }
@@ -14,6 +14,6 @@ class DayN : AdventSolution<Int>() {
 }
 
 fun main(args: Array<String>) {
-    AdventRunner(2022, 0, DayN()).run()
+    AdventRunner(2022, 7, Day7()).run()
 
 }
