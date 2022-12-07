@@ -2,15 +2,16 @@ package xyz.faber.adventofcode.year2022.day7
 
 import xyz.faber.adventofcode.util.AdventRunner
 import xyz.faber.adventofcode.util.AdventSolution
+import xyz.faber.adventofcode.util.recursiveFlatten
 
 class Dir(val parent: Dir?, val name: String) {
     val subdirs = mutableListOf<Dir>()
     var filesizes = 0L
 }
 
-fun Dir.recursiveExpand(): Sequence<Dir> = sequenceOf(this) + this.subdirs.flatMap { it.recursiveExpand() }
+fun Dir.recursiveFlatten(): Sequence<Dir> = this.recursiveFlatten { it.subdirs.asSequence() }
 
-fun Dir.totalSize() = this.recursiveExpand().sumOf { it.filesizes }
+fun Dir.totalSize() = this.recursiveFlatten().sumOf { it.filesizes }
 
 class Day7 : AdventSolution<Long>() {
     fun traverse(input: List<String>): Dir {
@@ -18,21 +19,13 @@ class Day7 : AdventSolution<Long>() {
         val root = Dir(null, "/")
         var currentDir = root
         for (cmd in cmds) {
-            if (cmd[0] == "$" && cmd[1] == "cd" && cmd[2] == "/") {
-                currentDir = root
-            } else if (cmd[0] == "$" && cmd[1] == "cd" && cmd[2] == "..") {
-                currentDir = currentDir.parent!!
-            } else if (cmd[0] == "$" && cmd[1] == "cd") {
-                var nextDir = currentDir.subdirs.singleOrNull { it.name == cmd[2] }
-                assert(nextDir != null) { "Did not ls ${cmd[1]} before cd" }
-                currentDir = nextDir!!
-            } else if (cmd[0] == "$" && cmd[1] == "ls") {
-                //
-            } else if (cmd[0] == "dir") {
-                val dir = Dir(currentDir, cmd[1])
-                currentDir.subdirs += dir
-            } else {
-                currentDir.filesizes += cmd[0].toLong()
+            when {
+                cmd[0] == "$" && cmd[1] == "cd" && cmd[2] == "/" -> currentDir = root
+                cmd[0] == "$" && cmd[1] == "cd" && cmd[2] == ".." -> currentDir = currentDir.parent!!
+                cmd[0] == "$" && cmd[1] == "cd" -> currentDir = currentDir.subdirs.singleOrNull { it.name == cmd[2] } ?: throw IllegalArgumentException("Did not ls ${cmd[1]} before cd")
+                cmd[0] == "$" && cmd[1] == "ls" -> {}
+                cmd[0] == "dir" -> currentDir.subdirs += Dir(currentDir, cmd[1])
+                else -> currentDir.filesizes += cmd[0].toLong()
             }
         }
         return root
@@ -41,7 +34,7 @@ class Day7 : AdventSolution<Long>() {
     override fun part1(input: List<String>): Long {
         val root = traverse(input)
 
-        val smallDirs = root.recursiveExpand()
+        val smallDirs = root.recursiveFlatten()
             .filter { it.totalSize() <= 100000L }
 
         return smallDirs.sumOf { it.totalSize() }
@@ -52,7 +45,7 @@ class Day7 : AdventSolution<Long>() {
 
         val missingSpace = root.totalSize() - (70000000 - 30000000)
 
-        val bestDir = root.recursiveExpand()
+        val bestDir = root.recursiveFlatten()
             .filter { it.totalSize() >= missingSpace }
             .minBy { it.totalSize() }
 
