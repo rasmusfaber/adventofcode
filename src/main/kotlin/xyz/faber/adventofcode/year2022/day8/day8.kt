@@ -3,35 +3,29 @@ package xyz.faber.adventofcode.year2022.day8
 import xyz.faber.adventofcode.util.*
 
 class Day8 : AdventSolution<Int>() {
-    private fun visible(pos: Pos, map: XYMap<Int>): Boolean {
-        val height = map[pos]
-        return (0..(pos.x - 1)).all { map[Pos(it, pos.y)] < height }
-                || ((pos.x + 1)..(map.maxx)).all { map[Pos(it, pos.y)] < height }
-                || (0..(pos.y - 1)).all { map[Pos(pos.x, it)] < height }
-                || ((pos.y + 1)..(map.maxy)).all { map[Pos(pos.x, it)] < height }
-    }
+    private fun Pos.limitedRay(direction: Direction, map: XYMap<Int>) =
+        this.ray(direction).drop(1).takeWhile { it.isInBoundsOf(map) }
 
-    private fun score(pos: Pos, map: XYMap<Int>, dir: Direction): Int {
-        val height = map[pos]
-        var res = 0
-        var p = pos + dir
-        while (map.isInBounds(p)) {
-            res++
-            if (map[p] >= height) return res
-            p = p.move(dir)
-        }
-        return res
-    }
+    private fun visible(pos: Pos, map: XYMap<Int>, direction: Direction) =
+        pos.limitedRay(direction, map)
+            .all { map[it] < map[pos] }
 
-    private fun score(pos: Pos, map: XYMap<Int>) =
-        score(pos, map, Direction.N) *
-                score(pos, map, Direction.W) *
-                score(pos, map, Direction.S) *
-                score(pos, map, Direction.E)
+    private fun visible(pos: Pos, map: XYMap<Int>) =
+        listOf(Direction.N, Direction.E, Direction.S, Direction.W)
+            .any { visible(pos, map, it) }
 
     override fun part1(input: List<String>): Int {
         val map = input.toIntXYMap()
         return map.count { visible(it.pos, map) }
+    }
+
+    private fun score(pos: Pos, map: XYMap<Int>, direction: Direction) =
+        pos.limitedRay(direction, map)
+            .indexOfFirst { it.isOnBorderOf(map) || map[it] >= map[pos] } + 1
+
+    private fun score(pos: Pos, map: XYMap<Int>): Int {
+        return listOf(Direction.N, Direction.E, Direction.S, Direction.W)
+            .map { score(pos, map, it) }.reduce(Int::times)
     }
 
     override fun part2(input: List<String>): Int {

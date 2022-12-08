@@ -65,6 +65,10 @@ open class XYMap<T>(minx: Int, maxx: Int, miny: Int, maxy: Int, values: List<T>,
 
     fun isInBounds(p: Pos) = isInBounds(p.x, p.y)
 
+    fun isOnBorder(x: Int, y: Int): Boolean = x == minx || x == maxx || y == miny || y == maxy
+
+    fun isOnBorder(p: Pos) = isOnBorder(p.x, p.y)
+
     private fun expand(x: Int, y: Int) {
         val newminx = min(minx, x)
         val newminy = min(miny, y)
@@ -332,4 +336,6 @@ fun <T> colorMapper(values: List<T>, blackVal: T?): (T, String) -> String {
     }
 }
 
-fun Pos.isOnBorderOf(map: XYMap<*>) = this.x == map.minx || this.x == map.maxx || this.y == map.miny || this.y == map.maxy
+fun Pos.isOnBorderOf(map: XYMap<*>) = map.isOnBorder(this)
+
+fun Pos.isInBoundsOf(map: XYMap<*>) = map.isInBounds(this)

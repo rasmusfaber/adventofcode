@@ -6,23 +6,29 @@ var ORIGIN = Pos(0, 0)
 
 data class Pos(val x: Int, val y: Int) {
     fun adjacent(): List<Pos> {
-        return listOf(Pos(x - 1, y - 1), Pos(x, y - 1), Pos(x + 1, y - 1),
-                Pos(x - 1, y), Pos(x + 1, y),
-                Pos(x - 1, y + 1), Pos(x, y + 1), Pos(x + 1, y + 1))
+        return listOf(
+            Pos(x - 1, y - 1), Pos(x, y - 1), Pos(x + 1, y - 1),
+            Pos(x - 1, y), Pos(x + 1, y),
+            Pos(x - 1, y + 1), Pos(x, y + 1), Pos(x + 1, y + 1)
+        )
 
     }
 
     fun adjacentNonDiagonal(): List<Pos> {
-        return listOf(Pos(x, y - 1),
-                Pos(x - 1, y), Pos(x + 1, y),
-                Pos(x, y + 1))
+        return listOf(
+            Pos(x, y - 1),
+            Pos(x - 1, y), Pos(x + 1, y),
+            Pos(x, y + 1)
+        )
 
     }
 
     fun adjacentDiagonal(): List<Pos> {
-        return listOf(Pos(x - 1, y - 1),
-                Pos(x - 1, y + 1), Pos(x + 1, y - 1),
-                Pos(x + 1, y + 1))
+        return listOf(
+            Pos(x - 1, y - 1),
+            Pos(x - 1, y + 1), Pos(x + 1, y - 1),
+            Pos(x + 1, y + 1)
+        )
 
     }
 
@@ -105,3 +111,5 @@ fun Pos.angle(): Double = atan2(this.y.toDouble(), this.x.toDouble())
 
 // Same direction is 0, going clockwise up to 2*PI
 fun Pos.angleWith(pos: Pos): Double = (this.angle() - pos.angle()).let { if (it >= 0) it else it + 2 * PI }
+
+fun Pos.ray(direction: Direction) = generateSequence(this) { it.move(direction) }
