@@ -248,10 +248,10 @@ fun Collection<Pos>.toXYMap(): XYMap<Boolean> {
 }
 
 fun List<String>.toIntXYMap(default: Int = 0): IntXYMap {
-    return toIntXYMap( default, {it.toString().toInt()})
+    return toIntXYMap(default, { it.toString().toInt() })
 }
 
-fun List<String>.toIntXYMap(default: Int = 0, mapper: (Char)->Int): IntXYMap {
+fun List<String>.toIntXYMap(default: Int = 0, mapper: (Char) -> Int): IntXYMap {
     if (this.any { it.length != this[0].length }) {
         throw IllegalArgumentException("Lines are not same length")
     }
@@ -331,3 +331,5 @@ fun <T> colorMapper(values: List<T>, blackVal: T?): (T, String) -> String {
         "${c}$s${reset}"
     }
 }
+
+fun Pos.isOnBorderOf(map: XYMap<*>) = this.x == map.minx || this.x == map.maxx || this.y == map.miny || this.y == map.maxy
