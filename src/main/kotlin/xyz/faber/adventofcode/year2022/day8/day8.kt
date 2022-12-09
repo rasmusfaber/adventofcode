@@ -16,8 +16,24 @@ class Day8 : AdventSolution<Int>() {
 
     override fun part1(input: List<String>): Int {
         val map = input.toIntXYMap()
+        map.count { start ->
+            Direction.values()
+                .any { dir ->
+                    start.pos.ray(dir).drop(1).takeWhile { it.isInBoundsOf(map) }
+                        .all { p -> map[p] < map[start] }
+                }
+        }
         return map.count { visible(it.pos, map) }
     }
+
+    fun part1(map: IntXYMap) =
+        map.count { start ->
+            Direction.values()
+                .any { dir ->
+                    start.pos.ray(dir).drop(1).takeWhile { it.isInBoundsOf(map) }
+                        .all { p -> map[p] < map[start] }
+                }
+        }
 
     private fun score(pos: Pos, map: XYMap<Int>, direction: Direction) =
         pos.limitedRay(direction, map)
@@ -32,6 +48,16 @@ class Day8 : AdventSolution<Int>() {
         val map = input.toIntXYMap()
         return map.maxOf { score(it.pos, map) }
     }
+
+    fun part2(map: IntXYMap) =
+        map.maxOf { start ->
+            Direction.values()
+                .map { dir ->
+                    start.pos.ray(dir).drop(1).takeWhile { it.isInBoundsOf(map) }
+                        .indexOfFirst { p -> p.isOnBorderOf(map) || map[p] >= map[start] } + 1
+                }
+                .reduce(Int::times)
+        }
 }
 
 fun main(args: Array<String>) {

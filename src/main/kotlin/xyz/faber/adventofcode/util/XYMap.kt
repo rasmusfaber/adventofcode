@@ -15,6 +15,7 @@ open class XYMap<T>(minx: Int, maxx: Int, miny: Int, maxy: Int, values: List<T>,
     constructor(dimx: Int, dimy: Int, values: (Pos) -> T) : this(dimx, dimy, (0 until dimy).flatMap { y -> (0 until dimx).toList().map { x -> values(Pos(x, y)) } })
     constructor(dimx: Int, dimy: Int, values: (Int, Int) -> T) : this(dimx, dimy, (0 until dimy).flatMap { y -> (0 until dimx).map { x -> values(x, y) } })
     constructor(dimx: Int, dimy: Int, default: T) : this(dimx, dimy, List(dimx * dimy) { default }, default, false)
+    constructor(minx: Int, maxx: Int, miny: Int, maxy: Int, default: T) : this(minx, maxx, miny, maxy, List((maxx - minx + 1) * (maxy - miny + 1)) { default }, default, false)
     constructor(default: T) : this(1, 1, listOf(default), default, true)
 
     var minx = minx
@@ -25,9 +26,9 @@ open class XYMap<T>(minx: Int, maxx: Int, miny: Int, maxy: Int, values: List<T>,
         private set
     var maxy = maxy
         private set
-    var offsetx = 0
+    var offsetx = minx
         private set
-    var offsety = 0
+    var offsety = miny
         private set
     var map = values.toMutableList()
 
@@ -45,6 +46,10 @@ open class XYMap<T>(minx: Int, maxx: Int, miny: Int, maxy: Int, values: List<T>,
 
     operator fun get(p: Pos): T {
         return get(p.x, p.y)
+    }
+
+    operator fun get(p: MapEntry<T>): T {
+        return get(p.pos)
     }
 
     operator fun set(x: Int, y: Int, value: T) {
@@ -244,9 +249,11 @@ fun Collection<Pair<Int, Int>>.toXYMap(): XYMap<Boolean> {
 
 @JvmName("toXYMapPos")
 fun Collection<Pos>.toXYMap(): XYMap<Boolean> {
+    val minx = this.minByOrNull { it.x }!!.x
+    val miny = this.minByOrNull { it.y }!!.y
     val maxx = this.maxByOrNull { it.x }!!.x
     val maxy = this.maxByOrNull { it.y }!!.y
-    val res = XYMap(maxx + 1, maxy + 1, false)
+    val res = XYMap(minx, maxx, miny, maxy, false)
     this.forEach { res[it.x, it.y] = true }
     return res
 }
