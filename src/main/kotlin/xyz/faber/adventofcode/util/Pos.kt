@@ -39,6 +39,8 @@ data class Pos(val x: Int, val y: Int) {
 
     operator fun minus(pos: Pos): Pos = Pos(this.x - pos.x, this.y - pos.y)
 
+    fun sign(): Pos = Pos(this.x.sign, this.y.sign)
+
     fun move(direction: Direction): Pos {
         return move(direction, 1)
     }
@@ -113,3 +115,8 @@ fun Pos.angle(): Double = atan2(this.y.toDouble(), this.x.toDouble())
 fun Pos.angleWith(pos: Pos): Double = (this.angle() - pos.angle()).let { if (it >= 0) it else it + 2 * PI }
 
 fun Pos.ray(direction: Direction) = generateSequence(this) { it.move(direction) }
+
+fun String.toPos(): Pos {
+    val (x, y) = this.split(",").map { it.trim().toInt() }
+    return Pos(x, y)
+}

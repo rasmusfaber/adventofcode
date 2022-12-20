@@ -16,7 +16,7 @@ open class XYMap<T>(minx: Int, maxx: Int, miny: Int, maxy: Int, values: List<T>,
     constructor(dimx: Int, dimy: Int, values: (Int, Int) -> T) : this(dimx, dimy, (0 until dimy).flatMap { y -> (0 until dimx).map { x -> values(x, y) } })
     constructor(dimx: Int, dimy: Int, default: T) : this(dimx, dimy, List(dimx * dimy) { default }, default, false)
     constructor(minx: Int, maxx: Int, miny: Int, maxy: Int, default: T) : this(minx, maxx, miny, maxy, List((maxx - minx + 1) * (maxy - miny + 1)) { default }, default, false)
-    constructor(default: T) : this(1, 1, listOf(default), default, true)
+    constructor(default: T) : this(-1, -1, listOf(default), default, true)
 
     var minx = minx
         private set
@@ -75,6 +75,15 @@ open class XYMap<T>(minx: Int, maxx: Int, miny: Int, maxy: Int, values: List<T>,
     fun isOnBorder(p: Pos) = isOnBorder(p.x, p.y)
 
     private fun expand(x: Int, y: Int) {
+        if (dimx == -1 && dimy == -1) {
+            minx = x
+            maxx = x
+            miny = y
+            maxy = y
+            offsetx = x
+            offsety = y
+            map = mutableListOf(default!!)
+        }
         val newminx = min(minx, x)
         val newminy = min(miny, y)
         val newmaxx = max(maxx, x)

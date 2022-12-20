@@ -82,7 +82,7 @@ fun getTests(year: Int, day: Int): List<String> {
         .toList()
     testDatas.withIndex()
         .forEach { (i, data) ->
-            File(basePath + "/${year}_$day.test-$i.txt")
+            File(basePath + "/${year}_$day-test-$i.txt")
                 .writeText(data)
         }
     return testDatas

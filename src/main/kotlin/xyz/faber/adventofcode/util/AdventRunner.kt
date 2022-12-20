@@ -1,5 +1,9 @@
 package xyz.faber.adventofcode.util
 
+import kotlin.time.ExperimentalTime
+import kotlin.time.TimedValue
+import kotlin.time.measureTimedValue
+
 class AdventRunner<T>(val year: Int, val day: Int, val solution: BaseAdventSolution<T>) {
     fun run() {
         val tests = getTests(year, day)
@@ -64,10 +68,11 @@ class AdventRunner<T>(val year: Int, val day: Int, val solution: BaseAdventSolut
         }
     }
 
+    @OptIn(ExperimentalTime::class)
     fun <I> tryRun(part: String, input: I, runFunc: (I) -> (T?)) {
-        val res = runFunc(input)
+        val (res, elapsed) = measureTimedValue {  runFunc(input) }
         if (res != null) {
-            println("$part: $res")
+            println("$part: $res (${elapsed})")
         }
     }
 }

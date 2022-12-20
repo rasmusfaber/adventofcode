@@ -15,6 +15,15 @@ fun <P> Map<P, List<P>>.toDirectedGraph(): DirectedGraph<P> {
     }
 }
 
+fun <P> ((P) -> Collection<P>).toDirectedGraph(): DirectedGraph<P> {
+    val self = this
+    return object : DirectedGraph<P> {
+        override fun getNeighbours(pos: P): Collection<P> {
+                    return self.invoke(pos)
+        }
+    }
+}
+
 fun <P> DirectedGraph<P>.toDirectedWeightedGraph(): DirectedWeightedGraph<P> {
     val dg = this
     return object : DirectedWeightedGraph<P> {
@@ -223,6 +232,16 @@ fun <T> XYMap<T>.toDirectedWeightedGraph(positions: Collection<Pos>, isOpen: (T)
 fun <T> XYMap<T>.addToBuilder(builder: DirectedWeightedGraphBuilder<Pos>, positions: Collection<Pos>, isOpen: (T) -> Boolean) {
     val topology = this.toGraph(isOpen)
     positions.forEach { p1 -> topology.getDistances(p1, positions).forEach { (p2, dist) -> builder.add(p1, p2, dist) } }
+}
+
+fun <T> DirectedGraph<T>.toDirectedWeightedGraph(positions: Collection<T>): DirectedWeightedGraph<T> {
+    return positions.associateWith { p1 -> (this.getDistances(p1, positions).map { (p2, dist) -> Edge(p1, p2, dist) }) }
+        .toDirectedWeightedGraph()
+}
+
+fun <T> DirectedGraph<T>.toFullDirectedWeightedGraph(positions: Collection<T>): DirectedWeightedGraph<T> {
+    return positions.associateWith { p1 -> (this.getDistances(p1, positions, true).map { (p2, dist) -> Edge(p1, p2, dist) }) }
+        .toDirectedWeightedGraph()
 }
 
 fun <T> XYMap<T>.toDirectedWeightedGraphByContent(positions: Collection<Pos>, isOpen: (T) -> Boolean): DirectedWeightedGraph<T> {
