@@ -37,6 +37,15 @@ enum class Direction {
             W -> S
         }
     }
+
+    fun toChar(): Char {
+        return when (this) {
+            N -> '^'
+            S -> 'v'
+            E -> '>'
+            W -> '<'
+        }
+    }
 }
 
 fun String.toDirection(): Direction {
