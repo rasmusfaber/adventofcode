@@ -357,7 +357,7 @@ fun Pos.isOnBorderOf(map: XYMap<*>) = map.isOnBorder(this)
 fun Pos.isInBoundsOf(map: XYMap<*>) = map.isInBounds(this)
 
 fun Pos.wrapAround(map: XYMap<*>): Pos {
-    val x = if (this.x < map.minx) map.maxx else if (this.x > map.maxx) map.minx else this.x
-    val y = if (this.y < map.miny) map.maxy else if (this.y > map.maxy) map.miny else this.y
+    val x = (x - map.minx).mod(map.dimx) + map.minx
+    val y = (y - map.miny).mod(map.dimy) + map.miny
     return Pos(x, y)
 }

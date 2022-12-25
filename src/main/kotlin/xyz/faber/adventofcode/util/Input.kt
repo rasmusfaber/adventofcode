@@ -53,7 +53,7 @@ fun getTests(year: Int, day: Int): List<String> {
         else -> System.getProperty("java.io.tmpdir") + "/advent"
     }
     File(basePath).mkdirs();
-    val files = Path(basePath).listDirectoryEntries("${year}_$day-test*.txt")
+    val files = Path(basePath).listDirectoryEntries("${year}_$day-test*.txt").sortedBy { it.fileName }
     if (files.any()) {
         return files.map { it.toFile().readText() }
     }
