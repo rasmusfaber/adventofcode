@@ -3,9 +3,45 @@ package xyz.faber.adventofcode.year2022.day25
 import com.google.common.math.LongMath
 import xyz.faber.adventofcode.util.AdventRunner
 import xyz.faber.adventofcode.util.AdventSolution
+import kotlin.math.max
 
 class Day25 : AdventSolution<String>() {
     override fun part1(input: List<String>): String {
+        return input.reduce(this::addSnafu) // 2--2-0=--0--100-=210
+    }
+
+    fun addSnafu(a: String, b: String): String {
+        val padLength = max(a.length,b.length)+1
+        return a.padStart(padLength, '0')
+            .zip(b.padStart(padLength, '0'))
+            .foldRight("" to 0, { (ac, bc), (acc, carry) -> addSnafu(ac, bc, carry).let { it.first + acc to it.second } })
+            .first.trimStart('0')
+    }
+
+    fun addSnafu(a: Char, b: Char, carry: Int): Pair<String, Int> {
+        val sum = snafuDigitToInt(a) + snafuDigitToInt(b) + carry
+        if (sum < -2) {
+            return intToSnafuDigit(sum + 5) to -1
+        } else if (sum > 2) {
+            return intToSnafuDigit(sum - 5) to 1
+        } else {
+            return intToSnafuDigit(sum) to 0
+        }
+    }
+
+    fun snafuDigitToInt(c: Char) = when (c) {
+        '=' -> -2
+        '-' -> -1
+        else -> c.digitToInt()
+    }
+
+    fun intToSnafuDigit(i: Int) = when (i) {
+        -2 -> "="
+        -1 -> "-"
+        else -> i.toString()
+    }
+
+    fun part1b(input: List<String>): String {
         val sum = input.sumOf { snafuToLong(it) }
         return longToSnafu(sum)
     }
