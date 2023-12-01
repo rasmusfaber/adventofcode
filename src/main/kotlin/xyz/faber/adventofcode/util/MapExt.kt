@@ -22,6 +22,6 @@ fun <K, V> Iterable<Pair<K, V>>.toMap(mergeFunction: (V, V) -> V): Map<K, V> {
 }
 
 private fun <K, V, M : MutableMap<K, V>> Iterable<Pair<K, V>>.toMap(destination: M, mergeFunction: BiFunction<in V, in V, out V?>): M {
-    this.forEach { (k, v) -> destination.merge(k, v, mergeFunction) }
+    this.forEach { (k, v) -> destination.merge(k, v!!, mergeFunction) }
     return destination
 }

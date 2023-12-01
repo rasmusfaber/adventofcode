@@ -46,14 +46,14 @@ fun getInput(year: Int, day: Int): String {
     return text
 }
 
-fun getTests(year: Int, day: Int): List<String> {
+fun getTests(year: Int, day: Int, partsCompleted: Int): List<String> {
     val basePath = when {
         SystemUtils.IS_OS_WINDOWS -> "c:\\temp\\advent"
         SystemUtils.IS_OS_LINUX -> System.getProperty("user.home") + "/tmp/advent"
         else -> System.getProperty("java.io.tmpdir") + "/advent"
     }
     File(basePath).mkdirs();
-    val files = Path(basePath).listDirectoryEntries("${year}_$day-test*.txt").sortedBy { it.fileName }
+    val files = Path(basePath).listDirectoryEntries("${year}_$day-$partsCompleted-test*.txt").sortedBy { it.fileName }
     if (files.any()) {
         return files.map { it.toFile().readText() }
     }
@@ -82,7 +82,7 @@ fun getTests(year: Int, day: Int): List<String> {
         .toList()
     testDatas.withIndex()
         .forEach { (i, data) ->
-            File(basePath + "/${year}_$day-test-$i.txt")
+            File(basePath + "/${year}_$day-$partsCompleted-test-$i.txt")
                 .writeText(data)
         }
     return testDatas
