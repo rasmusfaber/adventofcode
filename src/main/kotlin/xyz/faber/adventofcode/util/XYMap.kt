@@ -234,11 +234,11 @@ data class MapEntry<T>(val pos: Pos, val value: T)
 
 fun <T> List<T>.toXYMap(dimx: Int, dimy: Int): XYMap<T> = XYMap(dimx, dimy, this)
 
-fun List<String>.toXYMap(): XYMap<Char> {
+fun List<String>.toXYMap(): CharXYMap {
     if (this.any { it.length != this[0].length }) {
         throw IllegalArgumentException("Lines are not same length")
     }
-    return XYMap(this[0].length, this.size, this.joinToString("").toCharArray().toList(), ' ', false)
+    return CharXYMap(this[0].length, this.size, this.joinToString("").toCharArray().toList())
 }
 
 fun <T> List<String>.toXYMap(transform: (Char) -> T, default: T): XYMap<T> {
@@ -278,7 +278,7 @@ fun List<String>.toIntXYMap(default: Int = 0, mapper: (Char) -> Int): IntXYMap {
     return IntXYMap(this[0].length, this.size, this.joinToString("").toCharArray().toList().map(mapper), default, false)
 }
 
-fun String.toXYMap(): XYMap<Char> = this.lines().filter { it.isNotBlank() }.toXYMap()
+fun String.toXYMap(): CharXYMap = this.lines().filter { it.isNotBlank() }.toXYMap()
 
 fun <T> XYMap<T>.toMap(): Map<Pos, T> = this.positions().map { it to this[it] }.toMap()
 
@@ -326,6 +326,7 @@ class IntXYMap(minx: Int, maxx: Int, miny: Int, maxy: Int, values: List<Int>, de
 }
 
 class CharXYMap(minx: Int, maxx: Int, miny: Int, maxy: Int, values: List<Char>, autoexpand: Boolean) : XYMap<Char>(minx, maxx, miny, maxy, values, ' ', autoexpand) {
+
     constructor(dimx: Int, dimy: Int, values: List<Char>, autoexpand: Boolean) : this(0, dimx - 1, 0, dimy - 1, values, autoexpand)
     constructor(dimx: Int, dimy: Int, values: List<Char>) : this(dimx, dimy, values, false)
     constructor(dimx: Int, dimy: Int, values: (Int, Int) -> Char) : this(dimx, dimy, (0 until dimy).flatMap<Int, Char> { y: Int -> (0 until dimx).map { x -> values(x, y) } })

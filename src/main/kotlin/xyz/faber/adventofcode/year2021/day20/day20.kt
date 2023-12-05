@@ -42,7 +42,7 @@ class Day20 {
 
     fun part2() {
         val algo = input[0]
-        var map = input.drop(1).toXYMap()
+        var map: XYMap<Char> = input.drop(1).toXYMap()
         for(i in 1..50){
             map = enhance(map, algo, if(i%2==0) '.' else '#')
         }

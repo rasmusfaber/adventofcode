@@ -14,7 +14,7 @@ class Day24 {
             "#...."
 
     fun part1() {
-        var map = input.toXYMap()
+        var map : XYMap<Char> = input.toXYMap()
         map.default = '.'
         val seen = mutableSetOf(map.map)
         while (true) {
@@ -48,7 +48,7 @@ class Day24 {
 
 
     fun part2() {
-        var map = input.toXYMap()
+        var map: XYMap<Char> = input.toXYMap()
         map.default = '.'
         var maps = mapOf(0 to map)
         for (i in 1..200) {

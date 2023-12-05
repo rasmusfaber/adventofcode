@@ -4,7 +4,7 @@ import xyz.faber.adventofcode.util.*
 
 class Day25: AdventSolution<Int>() {
     override fun part1(input: List<String>): Int {
-        var map = input.toXYMap()
+        var map: XYMap<Char> = input.toXYMap()
         var steps = 0
         while (true) {
             //map.print()

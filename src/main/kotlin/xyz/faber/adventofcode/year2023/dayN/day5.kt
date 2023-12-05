@@ -9,11 +9,11 @@ class DayN : AdventSolution<Int>() {
     }
 
     override fun part2(input: List<String>): Int {
-        return 0
+        throw NotImplementedError()
     }
 }
 
 fun main(args: Array<String>) {
-    AdventRunner(2022, 0, DayN()).run()
+    AdventRunner(2023, 0, DayN()).run()
 
 }

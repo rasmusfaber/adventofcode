@@ -95,7 +95,14 @@ class AdventRunner<T>(val year: Int, val day: Int, val solution: BaseAdventSolut
   }
 
   private fun <I> runPart2Empty(solution: AdventSolutionWithTransform<T, I>) {
-    solution.part2(solution.transformAll("")!!)
+    try {
+      val t = solution.transformAll(" ")
+      if (t != null) {
+        solution.part2(t)
+      }
+    } catch (e: Exception) {
+      // ignore
+    }
     solution.part2(emptyList())
   }
 
