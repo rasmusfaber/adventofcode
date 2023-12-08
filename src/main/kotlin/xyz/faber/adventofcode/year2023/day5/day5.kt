@@ -14,7 +14,6 @@ data class MappingTable(val name: String, val mappings: List<Mapping>) {
   }
 
   fun apply(r: LongRange): List<LongRange> {
-    val res = mutableListOf<LongRange>()
     var i = r.start
     val m = mappings.find { it.applies(i) }
     if (m != null) {

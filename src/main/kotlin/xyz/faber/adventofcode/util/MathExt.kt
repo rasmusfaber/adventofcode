@@ -59,6 +59,10 @@ fun lcm(vararg values: Long) = values.reduce { a, b -> lcm(a, b) }
 
 fun lcm(vararg values: Int) = values.reduce { a, b -> lcm(a, b) }
 
+fun lcm(values: Collection<Long>) = values.reduce { a, b -> lcm(a, b) }
+
+fun lcm(values: Collection<Int>) = values.reduce { a, b -> lcm(a, b) }
+
 fun modinverse(a: Long, m: Long): Long {
     val (_, x, y) = gcdExtended(a, m)
     return (x % m + m) % m

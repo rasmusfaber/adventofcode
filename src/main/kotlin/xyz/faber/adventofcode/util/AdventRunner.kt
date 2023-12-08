@@ -1,7 +1,6 @@
 package xyz.faber.adventofcode.util
 
 import kotlin.time.ExperimentalTime
-import kotlin.time.TimedValue
 import kotlin.time.measureTimedValue
 
 class AdventRunner<T>(val year: Int, val day: Int, val solution: BaseAdventSolution<T>) {
@@ -88,10 +87,34 @@ class AdventRunner<T>(val year: Int, val day: Int, val solution: BaseAdventSolut
   }
 
   private fun runPart2Empty(solution: AdventSolution<T>) {
-    solution.part2("")
-    solution.part2(emptyList<String>())
-    solution.part2(emptyList<Int>())
-    solution.part2Csv(emptyList())
+    try {
+      solution.part2("")
+    } catch (e: NotImplementedError) {
+      throw e
+    } catch (e: Exception) {
+      // ignore
+    }
+    try {
+      solution.part2(emptyList<String>())
+    } catch (e: NotImplementedError) {
+      throw e
+    } catch (e: Exception) {
+      // ignore
+    }
+    try {
+      solution.part2(emptyList<Int>())
+    } catch (e: NotImplementedError) {
+      throw e
+    } catch (e: Exception) {
+      // ignore
+    }
+    try {
+      solution.part2Csv(emptyList())
+    } catch (e: NotImplementedError) {
+      throw e
+    } catch (e: Exception) {
+      // ignore
+    }
   }
 
   private fun <I> runPart2Empty(solution: AdventSolutionWithTransform<T, I>) {
@@ -100,10 +123,18 @@ class AdventRunner<T>(val year: Int, val day: Int, val solution: BaseAdventSolut
       if (t != null) {
         solution.part2(t)
       }
+    } catch (e: NotImplementedError) {
+      throw e
     } catch (e: Exception) {
       // ignore
     }
-    solution.part2(emptyList())
+    try {
+      solution.part2(emptyList())
+    } catch (e: NotImplementedError) {
+      throw e
+    } catch (e: Exception) {
+      // ignore
+    }
   }
 
 
