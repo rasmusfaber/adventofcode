@@ -37,6 +37,12 @@ open class XYMap<T>(minx: Int, maxx: Int, miny: Int, maxy: Int, values: List<T>,
     val dimy: Int
         get() = maxy - miny + 1
 
+    val xrange: IntRange
+        get() = minx..maxx
+
+    val yrange: IntRange
+        get() = miny..maxy
+
     operator fun get(x: Int, y: Int): T {
         if (!isInBounds(x, y)) {
             return default ?: throw ArrayIndexOutOfBoundsException()
