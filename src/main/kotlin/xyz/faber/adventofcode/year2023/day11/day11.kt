@@ -1,7 +1,6 @@
 package xyz.faber.adventofcode.year2023.day11
 
 import xyz.faber.adventofcode.util.*
-import kotlin.math.abs
 import kotlin.math.max
 import kotlin.math.min
 
@@ -11,8 +10,8 @@ class Day11 : AdventSolutionWithTransform<Long, CharXYMap>() {
   fun solve(input: CharXYMap, expansion: Long): Long {
     val emptyColumns = input.xrange.filter { x -> input.yrange.all { y -> input[x, y] == '.' } }
     val emptyRows = input.yrange.filter { y -> input.xrange.all { x -> input[x, y] == '.' } }
-    val stars = input.positions().filter { input[it] == '#' }
-    val pairs = stars.combinations(2)
+    val galaxies = input.positions().filter { input[it] == '#' }
+    val pairs = galaxies.combinations(2)
 
     return pairs.sumOf {
       distance(it.first().x, it.last().x, emptyColumns, expansion) +
