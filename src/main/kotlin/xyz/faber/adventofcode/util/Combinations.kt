@@ -1,12 +1,13 @@
 package xyz.faber.adventofcode.util
 
+import com.google.common.collect.Sets
+
 fun <T> Collection<T>.combinations(combinationSize: Int): Set<Set<T>> = when {
     combinationSize < 0 -> throw Error("combinationSize cannot be smaller then 0. It is equal to $combinationSize")
     combinationSize == 0 -> setOf(setOf())
+    combinationSize == 1 -> this.map { setOf(it) }.toSet()
     combinationSize >= size -> setOf(toSet())
-    else -> powerset()
-            .filter { it.size == combinationSize }
-            .toSet()
+    else -> Sets.combinations(this.toSet(), combinationSize)
 }
 
 fun <T> Collection<T>.powerset(): Set<Set<T>> = powerset(this, setOf(setOf()))
