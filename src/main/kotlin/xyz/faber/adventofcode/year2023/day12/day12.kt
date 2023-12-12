@@ -2,7 +2,6 @@ package xyz.faber.adventofcode.year2023.day12
 
 import arrow.core.Tuple5
 import xyz.faber.adventofcode.util.AdventRunner
-import xyz.faber.adventofcode.util.AdventSolution
 import xyz.faber.adventofcode.util.AdventSolutionWithTransform
 
 class Day12 : AdventSolutionWithTransform<Long, Pair<String, List<Int>>>() {
@@ -16,7 +15,7 @@ class Day12 : AdventSolutionWithTransform<Long, Pair<String, List<Int>>>() {
 
   val cache = mutableMapOf<Tuple5<String, Int, Int?, List<Int>, Int>, Long>()
 
-  tailrec fun possibleArrangements(s: String, ps: Int, condition: Int?, conditions: List<Int>, pc: Int): Long {
+  fun possibleArrangements(s: String, ps: Int, condition: Int?, conditions: List<Int>, pc: Int): Long {
     if (ps >= s.length) {
       return if ((condition == 0 || condition == null) && pc >= conditions.size) {
         1
@@ -59,12 +58,10 @@ class Day12 : AdventSolutionWithTransform<Long, Pair<String, List<Int>>>() {
       if (pc >= conditions.size) {
         return possibleArrangements(s, ps + 1, 0, conditions, pc)
       }
-      val cacheKey = Tuple5(s, ps, condition, conditions, pc)
-      return cache.getOrElse(cacheKey) {
+      return cache.getOrPut(Tuple5(s, ps, condition, conditions, pc)) {
         val res1 = possibleArrangements(s, ps + 1, null, conditions, pc)
         val res2 = possibleArrangements(s, ps + 1, conditions[pc] - 1, conditions, pc + 1)
-        cache[cacheKey] = res1 + res2
-        return res1 + res2
+        res1 + res2
       }
     } else {
       if (condition > 0) {
