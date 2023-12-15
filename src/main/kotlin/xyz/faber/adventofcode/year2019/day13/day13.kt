@@ -4,6 +4,7 @@ import adventofcode.year2019.intcode.Machine
 import adventofcode.year2019.intcode.collectIntParams
 import xyz.faber.adventofcode.util.IntXYMap
 import xyz.faber.adventofcode.util.getInputLongsFromCsv
+import xyz.faber.adventofcode.util.intXYMap
 import xyz.faber.adventofcode.util.toMap
 import kotlin.math.sign
 
@@ -12,7 +13,7 @@ class Day13 {
 
     fun part1(): Int {
         val machine = Machine(input)
-        val map = IntXYMap()
+        val map = intXYMap()
         machine.sendOutput = collectIntParams { x, y, tile ->
             map[x, y] = tile
         }
@@ -26,7 +27,7 @@ class Day13 {
     fun part2(): Int {
         val machine = Machine(input)
         machine.mem[0] = 2
-        val map = IntXYMap()
+        val map = intXYMap()
         var score = 0
         machine.sendOutput = collectIntParams { x, y, z ->
             if (x == -1 && y == 0) {

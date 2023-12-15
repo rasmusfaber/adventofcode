@@ -16,6 +16,7 @@ open class XYMap<T>(minx: Int, maxx: Int, miny: Int, maxy: Int, values: List<T>,
     constructor(dimx: Int, dimy: Int, values: (Int, Int) -> T) : this(dimx, dimy, (0 until dimy).flatMap { y -> (0 until dimx).map { x -> values(x, y) } })
     constructor(dimx: Int, dimy: Int, default: T) : this(dimx, dimy, List(dimx * dimy) { default }, default, false)
     constructor(minx: Int, maxx: Int, miny: Int, maxy: Int, default: T) : this(minx, maxx, miny, maxy, List((maxx - minx + 1) * (maxy - miny + 1)) { default }, default, false)
+    constructor(minx: Int, maxx:Int, miny: Int, maxy:Int, values: (Int, Int) -> T) : this(minx, maxx, miny, maxy, (miny ..maxy).flatMap { y -> (minx..maxx).map { x -> values(x, y) } }, null, false)
     constructor(default: T) : this(-1, -1, listOf(default), default, true)
 
     var minx = minx
@@ -233,6 +234,7 @@ open class XYMap<T>(minx: Int, maxx: Int, miny: Int, maxy: Int, values: List<T>,
     fun mapIndexed(transform: (Pos, T) -> T): XYMap<T> = XYMap(minx, maxx, miny, maxy, map.mapIndexed { i, v -> transform(Pos(i % dimx, i / dimx), v) }, default, autoexpand)
 
     fun replaceValues(transform: (T) -> T) = map.replaceAll(transform)
+    fun transpose(): XYMap<T> = XYMap(miny, maxy, minx, maxx, (minx..maxx).flatMap { y-> (miny..maxy).map{x->this[y,x]} }, default, autoexpand)
 }
 
 data class MapEntry<T>(val pos: Pos, val value: T)
@@ -323,22 +325,11 @@ fun Map<Pos, Int>.toXYMap(): XYMap<Int> = this.toXYMap(0)
 @JvmName("toLongXYMap")
 fun Map<Pos, Long>.toXYMap(): XYMap<Long> = this.toXYMap(0L)
 
-class IntXYMap(minx: Int, maxx: Int, miny: Int, maxy: Int, values: List<Int>, default: Int, autoexpand: Boolean) : XYMap<Int>(minx, maxx, miny, maxy, values, default, autoexpand) {
-    constructor(dimx: Int, dimy: Int, values: List<Int>, default: Int, autoexpand: Boolean) : this(0, dimx - 1, 0, dimy - 1, values, default, autoexpand)
-    constructor(dimx: Int, dimy: Int, values: List<Int>) : this(dimx, dimy, values, 0, false)
-    constructor(dimx: Int, dimy: Int, values: (Int, Int) -> Int) : this(dimx, dimy, (0 until dimy).flatMap { y -> (0 until dimx).map { x -> values(x, y) } })
-    constructor(dimx: Int, dimy: Int) : this(dimx, dimy, List(dimx * dimy) { 0 }, 0, false)
-    constructor() : this(1, 1, listOf(0), 0, true)
-}
+typealias IntXYMap = XYMap<Int>
+typealias CharXYMap = XYMap<Char>
 
-class CharXYMap(minx: Int, maxx: Int, miny: Int, maxy: Int, values: List<Char>, autoexpand: Boolean) : XYMap<Char>(minx, maxx, miny, maxy, values, ' ', autoexpand) {
-
-    constructor(dimx: Int, dimy: Int, values: List<Char>, autoexpand: Boolean) : this(0, dimx - 1, 0, dimy - 1, values, autoexpand)
-    constructor(dimx: Int, dimy: Int, values: List<Char>) : this(dimx, dimy, values, false)
-    constructor(dimx: Int, dimy: Int, values: (Int, Int) -> Char) : this(dimx, dimy, (0 until dimy).flatMap<Int, Char> { y: Int -> (0 until dimx).map { x -> values(x, y) } })
-    constructor(dimx: Int, dimy: Int) : this(dimx, dimy, List(dimx * dimy) { ' ' }, false)
-    constructor() : this(1, 1, listOf(' '), true)
-}
+fun intXYMap() = IntXYMap(0)
+fun charXYMap() = CharXYMap(' ')
 
 val colors = listOf(white, red, blue, yellow, green, cyan, magenta)
 
