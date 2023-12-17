@@ -288,6 +288,8 @@ fun List<String>.toIntXYMap(default: Int = 0, mapper: (Char) -> Int): IntXYMap {
 
 fun String.toXYMap(): CharXYMap = this.lines().filter { it.isNotBlank() }.toXYMap()
 
+fun String.toIntXYMap(): IntXYMap = this.lines().filter { it.isNotBlank() }.toXYMap().map{it.toString().toInt()}
+
 fun <T> XYMap<T>.toMap(): Map<Pos, T> = this.positions().map { it to this[it] }.toMap()
 
 fun <T> List<List<T>>.listsToXYMap(): XYMap<T> = this.flatten().toXYMap(this[0].size, this.size)
