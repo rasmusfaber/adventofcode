@@ -25,14 +25,15 @@ class Day18 : AdventSolution<Long>() {
     val border = mutableSetOf<Pos>()
     var pos = Pos(0, 0)
     border += pos
-    input.map { it.split(' ') }.forEach { (d, r, _) ->
-      val dir = d.toDirection()
-      val repeat = r.toInt()
-      (1..repeat).forEach {
-        pos += dir
-        border += pos
+    input.map { it.split(' ') }
+      .forEach { (d, r, _) ->
+        val dir = d.toDirection()
+        val repeat = r.toInt()
+        (1..repeat).forEach {
+          pos += dir
+          border += pos
+        }
       }
-    }
     val minx = border.minOf { it.x }!! - 1
     val maxx = border.maxOf { it.x }!! + 1
     val miny = border.minOf { it.y }!! - 1
@@ -54,7 +55,7 @@ class Day18 : AdventSolution<Long>() {
     return dir to repeat
   }
 
-  override fun part2(input: List<String>): Long {
+  fun part2a(input: List<String>): Long {
     val borderPoints = mutableListOf<Pos>()
     var pos = Pos(0, 0)
     borderPoints += pos
@@ -73,6 +74,14 @@ class Day18 : AdventSolution<Long>() {
       prevTurn = turn
     }
     return abs(borderPoints.indices.sumOf { borderPoints[it].x.toLong() * borderPoints[(it + 1) % borderPoints.size].y.toLong() - borderPoints[(it + 1) % borderPoints.size].x.toLong() * borderPoints[it].y.toLong() }) / 2
+  }
+
+  override fun part2(input: List<String>): Long {
+    val instructions = input.map { it.split(' ') }
+      .map { (_, _, i) -> parseHexInstruction(i) }
+    var borderLength = instructions.sumOf{it.second}
+    val borderPoints = instructions.scan(Pos(0,0)){acc, ins -> acc.move(ins.first, ins.second)}
+    return borderLength / 2 + 1 + abs(borderPoints.zipWithNext().sumOf { (a, b) ->  a.x.toLong() * b.y.toLong() - a.y.toLong()*b.x.toLong()}) / 2
   }
 }
 
