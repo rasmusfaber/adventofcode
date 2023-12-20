@@ -35,6 +35,7 @@ dependencies {
   implementation("io.arrow-kt:arrow-core:0.7.3")
   implementation("com.github.kittinunf.fuel:fuel:2.3.1")
   implementation("io.github.tudo-aqua:z3-turnkey:4.8.12")
+  implementation("guru.nidi:graphviz-kotlin:0.18.1")
 }
 
 kotlin { // Extension for easy setup
