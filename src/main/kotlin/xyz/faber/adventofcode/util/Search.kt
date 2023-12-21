@@ -15,6 +15,24 @@ fun <P> Map<P, List<P>>.toDirectedGraph(): DirectedGraph<P> {
   }
 }
 
+fun <T> XYMap<T>.toDirectedGraph(isOpen: (T) -> Boolean): DirectedGraph<Pos> {
+  val self = this
+  return object : DirectedGraph<Pos> {
+    override fun getNeighbours(pos: Pos): Collection<Pos> {
+      return pos.adjacentNonDiagonal().filter { self.isInBounds(it) && isOpen(self[it]) }
+    }
+  }
+}
+
+fun <T> XYMap<T>.toInfiniteDirectedGraph(isOpen: (T) -> Boolean): DirectedGraph<Pos> {
+  val self = this
+  return object : DirectedGraph<Pos> {
+    override fun getNeighbours(pos: Pos): Collection<Pos> {
+      return pos.adjacentNonDiagonal().filter { isOpen(self[it.x.mod(self.dimx), it.y.mod(self.dimy)]) }
+    }
+  }
+}
+
 fun <P> ((P) -> Collection<P>).toDirectedGraph(): DirectedGraph<P> {
   val self = this
   return object : DirectedGraph<P> {
@@ -280,7 +298,7 @@ fun <T> XYMap<T>.toDirectedWeightedGraphByContent(
     .toDirectedWeightedGraph()
 }
 
-fun <P> DirectedGraph<P>.getDistances(
+public fun <P> DirectedGraph<P>.getDistances(
   start: P,
   destinations: Collection<P>,
   continueOnPos: Boolean = false
@@ -290,6 +308,9 @@ fun <P> DirectedGraph<P>.getDistances(
   val visited = mutableSetOf<P>()
   val queue = LinkedList<Pair<P, Int>>()
   queue.addLast(start to 0)
+  if (start in destinations) {
+    res[start] = 0
+  }
   missing.remove(start)
   while (!(queue.isEmpty() || missing.isEmpty())) {
     val (pos, dist) = queue.pop()
@@ -308,6 +329,31 @@ fun <P> DirectedGraph<P>.getDistances(
       visited.add(pos)
       val neighbours = this.getNeighbours(pos)
       queue.addAll(neighbours.filter { it !in visited }.map { it to dist + 1 })
+    }
+  }
+  return res
+}
+
+public fun <P> DirectedGraph<P>.getDistancesCloserThan(
+  start: P,
+  maxDistance: Int,
+  restrictedTo: (P)->Boolean = {true}
+): Map<P, Int> {
+  val res = mutableMapOf<P, Int>()
+  val visited = mutableSetOf<P>()
+  val queue = LinkedList<Pair<P, Int>>()
+  queue.addLast(start to 0)
+  res[start] = 0
+  while (queue.isNotEmpty()) {
+    val (pos, dist) = queue.pop()
+    if (pos in visited) {
+      continue
+    }
+    res[pos] = dist
+    visited.add(pos)
+    if(dist<maxDistance) {
+      val neighbours = this.getNeighbours(pos)
+      queue.addAll(neighbours.filter { it !in visited && restrictedTo(it)}.map { it to dist + 1 })
     }
   }
   return res

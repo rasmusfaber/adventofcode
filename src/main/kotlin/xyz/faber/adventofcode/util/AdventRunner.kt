@@ -145,7 +145,7 @@ class AdventRunner<T>(val year: Int, val day: Int, val solution: BaseAdventSolut
         runFunc(input)
       } catch (e: NotImplementedError) {
         null
-      } catch (e: Exception) {
+      } catch (e: Error) {
         if (ignoreExceptions) {
           null
         } else {

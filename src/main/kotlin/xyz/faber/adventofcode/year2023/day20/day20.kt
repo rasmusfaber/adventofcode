@@ -9,6 +9,7 @@ import guru.nidi.graphviz.model.Factory.node
 import guru.nidi.graphviz.toGraphviz
 import xyz.faber.adventofcode.util.AdventRunner
 import xyz.faber.adventofcode.util.AdventSolution
+import xyz.faber.adventofcode.util.lcm
 import xyz.faber.adventofcode.util.show
 
 class Day20 : AdventSolution<Long>() {
@@ -165,7 +166,7 @@ class Day20 : AdventSolution<Long>() {
     showAsGraph(modules)
     val rxsources = inputs["rx"]!!.flatMap { inputs[it.name]!!.map { it.name } }
     val cycles = rxsources.map { findCycleLength(modules, it) }
-    return cycles.product()
+    return lcm(cycles)
   }
 }
 
