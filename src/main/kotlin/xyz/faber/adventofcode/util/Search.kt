@@ -147,6 +147,27 @@ fun <P> dfsWithPath(graph: DirectedGraph<P>, start: P): Sequence<List<P>> = sequ
   }
 }
 
+private fun <P> dfsTopologicalSort(node: P, graph: DirectedGraph<P>, visited: MutableSet<P>, res: LinkedList<P>) {
+  visited += node
+  for (neighbour in graph.getNeighbours(node)) {
+    if (neighbour !in visited) {
+      dfsTopologicalSort(neighbour, graph, visited, res)
+    }
+  }
+  res.addFirst(node)
+}
+
+fun <P> topologicalSort(graph: DirectedGraph<P>, nodes: List<P>): List<P> {
+  val visited = mutableSetOf<P>()
+  val res = LinkedList<P>()
+  for (node in nodes) {
+    if (node !in visited) {
+      dfsTopologicalSort(node, graph, visited, res)
+    }
+  }
+  return res
+}
+
 fun <P> dfsWithPath(graph: DirectedGraph<P>, start: P, predicate: (P) -> Boolean) =
   dfsWithPath(graph, start).filter { predicate(it.last()) }
 
@@ -276,7 +297,10 @@ fun <T> XYMap<T>.addToBuilder(
 }
 
 fun <T> DirectedGraph<T>.toDirectedWeightedGraph(positions: Collection<T>): DirectedWeightedGraph<T> {
-  return positions.associateWith { p1 -> (this.getDistances(p1, positions).map { (p2, dist) -> Edge(p1, p2, dist) }) }
+  return positions.associateWith { p1 ->
+    (this.getDistances(p1, positions.filter { it != p1 })
+      .map { (p2, dist) -> Edge(p1, p2, dist) })
+  }
     .toDirectedWeightedGraph()
 }
 
@@ -337,7 +361,7 @@ public fun <P> DirectedGraph<P>.getDistances(
 public fun <P> DirectedGraph<P>.getDistancesCloserThan(
   start: P,
   maxDistance: Int,
-  restrictedTo: (P)->Boolean = {true}
+  restrictedTo: (P) -> Boolean = { true }
 ): Map<P, Int> {
   val res = mutableMapOf<P, Int>()
   val visited = mutableSetOf<P>()
@@ -351,9 +375,9 @@ public fun <P> DirectedGraph<P>.getDistancesCloserThan(
     }
     res[pos] = dist
     visited.add(pos)
-    if(dist<maxDistance) {
+    if (dist < maxDistance) {
       val neighbours = this.getNeighbours(pos)
-      queue.addAll(neighbours.filter { it !in visited && restrictedTo(it)}.map { it to dist + 1 })
+      queue.addAll(neighbours.filter { it !in visited && restrictedTo(it) }.map { it to dist + 1 })
     }
   }
   return res
@@ -392,3 +416,8 @@ fun <P> DirectedGraph<P>.getRoutes(
   return res
 }
 
+private class DirectedGraphFromWeightedGraph<P>(val dwg: DirectedWeightedGraph<P>) : DirectedGraph<P> {
+  override fun getNeighbours(pos: P): Collection<P> = dwg.getNeighbours(pos).map { it.to }
+}
+
+fun <P> DirectedWeightedGraph<P>.withoutWeights() = DirectedGraphFromWeightedGraph(this) as DirectedGraph<P>
