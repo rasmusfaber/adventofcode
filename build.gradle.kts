@@ -36,6 +36,8 @@ dependencies {
   implementation("com.github.kittinunf.fuel:fuel:2.3.1")
   implementation("io.github.tudo-aqua:z3-turnkey:4.8.12")
   implementation("guru.nidi:graphviz-kotlin:0.18.1")
+  implementation("org.jetbrains.kotlinx:multik-core:0.2.2")
+  implementation("org.jetbrains.kotlinx:multik-default:0.2.2")
 }
 
 kotlin { // Extension for easy setup
