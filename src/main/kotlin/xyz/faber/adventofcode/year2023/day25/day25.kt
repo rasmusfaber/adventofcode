@@ -42,21 +42,11 @@ class Day25 : AdventSolution<Int>() {
     // Augment the flow while there is a path from source to sink
     val parent = mutableMapOf<String, String?>()
     while (bfs(residualGraph, source, sink, parent)) {
-      var pathFlow = true
       var v = sink
       while (v != source) {
-        val u = parent[v]
-        pathFlow = pathFlow && v in residualGraph[u]!!
-        v = u!!
-      }
-
-      v = sink
-      while (v != source) {
         val u = parent[v]!!
-        if (pathFlow) {
-          residualGraph[u]!! -= v
-          residualGraph[v]!! += v
-        }
+        residualGraph[u]!! -= v
+        residualGraph[v]!! += v
         v = u
       }
     }
@@ -96,7 +86,7 @@ class Day25 : AdventSolution<Int>() {
       val source = nodes.random()
       val sink = nodes.random()
       val (minCut, reachable) = minCut(source, sink, graph)
-      if(minCut.size==3) return reachable.size * (nodes.size-reachable.size)
+      if (minCut.size == 3) return reachable.size * (nodes.size - reachable.size)
     } while (true)
   }
 

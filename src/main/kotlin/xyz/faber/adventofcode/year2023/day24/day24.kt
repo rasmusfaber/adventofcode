@@ -1,8 +1,6 @@
 package xyz.faber.adventofcode.year2023.day24
 
-import com.microsoft.z3.BitVecNum
 import com.microsoft.z3.Context
-import com.microsoft.z3.IntExpr
 import com.microsoft.z3.IntNum
 import com.microsoft.z3.Status
 import org.jetbrains.kotlinx.multik.api.linalg.solve
@@ -11,14 +9,22 @@ import org.jetbrains.kotlinx.multik.api.ndarray
 import org.jetbrains.kotlinx.multik.ndarray.data.D2
 import org.jetbrains.kotlinx.multik.ndarray.data.NDArray
 import org.jetbrains.kotlinx.multik.ndarray.data.get
+import org.jetbrains.kotlinx.multik.ndarray.operations.minus
 import xyz.faber.adventofcode.util.AdventRunner
 import xyz.faber.adventofcode.util.AdventSolution
 import xyz.faber.adventofcode.util.combinations
+import kotlin.math.roundToLong
 
 class HailStone(val px: Long, val py: Long, val pz: Long, val vx: Long, val vy: Long, val vz: Long) {
   override fun toString(): String {
     return "$px, $py, $pz @ $vx, $vy, $vz"
   }
+
+  val pvector
+    get() = mk.ndarray(mk[mk[px], mk[py], mk[pz]])
+
+  val vvector
+    get() = mk.ndarray(mk[mk[vx], mk[vy], mk[vz]])
 }
 
 fun parseHailStone(s: String): HailStone {
@@ -46,6 +52,18 @@ fun intersects2D(a: HailStone, b: HailStone): Boolean {
   return x in 2e14..4e14 && y in 2e14..4e14
 }
 
+fun crossproduct(a: NDArray<Long, D2>, b: NDArray<Long, D2>): NDArray<Long, D2> {
+  return mk.ndarray(mk[mk[a[1][0] * b[2][0] - a[2][0] * b[1][0]], mk[a[2][0] * b[0][0] - a[0][0] * b[2][0]], mk[a[0][0] * b[1][0] - a[1][0] * b[0][0]]])
+}
+
+fun crossproductmatrix(a: NDArray<Long, D2>) = mk.ndarray(
+  mk[
+    mk[0L, -a[2][0], a[1][0]],
+    mk[a[2][0], 0L, -a[0][0]],
+    mk[-a[1][0], a[0][0], 0L]
+  ]
+)
+
 class Day24 : AdventSolution<Long>() {
   override fun part1(input: List<String>): Long {
     val hailStones = input.map { parseHailStone(it) }
@@ -53,64 +71,29 @@ class Day24 : AdventSolution<Long>() {
   }
 
   override fun part2(input: List<String>): Long {
-    return solveWithInt(input)
+    val hailStones = input.map { parseHailStone(it) }
+    return solveWithLinAlg(hailStones)
   }
 
-  private fun solveWithBitvec(input: List<String>): Long {
-    val hailStones = input.map { parseHailStone(it) }
-    val context = Context(mapOf("proof" to "true", "model" to "true"))
-    val solver = context.mkSolver()
-    val x = context.mkBVConst("x", 64)
-    val y = context.mkBVConst("y", 64)
-    val z = context.mkBVConst("z", 64)
-    val vx = context.mkBVConst("vx", 64)
-    val vy = context.mkBVConst("vy", 64)
-    val vz = context.mkBVConst("vz", 64)
-    val zero = context.mkBV(0, 64)
-    for ((i, h) in hailStones.withIndex().take(3)) {
-      val ti = context.mkBVConst("t$i", 64)
-      solver.add(context.mkBVSGE(ti, zero))
-      val xi = context.mkBV(h.px, 64)
-      val vxi = context.mkBV(h.vx, 64)
-      solver.add(
-        context.mkEq(
-          context.mkBVAdd(x, context.mkBVMul(ti, vx)),
-          context.mkBVAdd(xi, context.mkBVMul(ti, vxi))
-        )
-      )
-      val yi = context.mkBV(h.py, 64)
-      val vyi = context.mkBV(h.vy, 64)
-      solver.add(
-        context.mkEq(
-          context.mkBVAdd(y, context.mkBVMul(ti, vy)),
-          context.mkBVAdd(yi, context.mkBVMul(ti, vyi))
-        )
-      )
-      val zi = context.mkBV(h.pz, 64)
-      val vzi = context.mkBV(h.vz, 64)
-      solver.add(
-        context.mkEq(
-          context.mkBVAdd(z, context.mkBVMul(ti, vz)),
-          context.mkBVAdd(zi, context.mkBVMul(ti, vzi))
-        )
-      )
-      }
+  private fun solveWithLinAlg(hailStones: List<HailStone>): Long {
+    val h0 = hailStones[0]
+    val h1 = hailStones[1]
+    val h2 = hailStones[2]
 
-    val status = solver.check()
-    if (status != Status.SATISFIABLE) {
-      println("Not satisfiable")
-      throw IllegalArgumentException("Not satisfiable")
-      }
-    val model = solver.model
+    val b = (crossproduct(h0.pvector, h0.vvector) - crossproduct(h1.pvector, h1.vvector)).cat(
+      crossproduct(h0.pvector, h0.vvector) - crossproduct(h2.pvector, h2.vvector)
+    )
 
-    val xsolution = (model.evaluate(x, false) as BitVecNum).getLong()
-    val ysolution = (model.evaluate(y, false) as BitVecNum).getLong()
-    val zsolution = (model.evaluate(z, false) as BitVecNum).getLong()
-    return xsolution + ysolution + zsolution
+    val A00 = crossproductmatrix(h1.vvector - h0.vvector)
+    val A10 = crossproductmatrix(h0.pvector - h1.pvector)
+    val A01 = crossproductmatrix(h2.vvector - h0.vvector)
+    val A11 = crossproductmatrix(h0.pvector - h2.pvector)
+    val A = A00.cat(A10, 1).cat(A01.cat(A11, 1))
+    val res = mk.linalg.solve(A, b)
+    return res[0][0].roundToLong() + res[1][0].roundToLong() + res[2][0].roundToLong()
   }
 
-  private fun solveWithInt(input: List<String>): Long {
-    val hailStones = input.map { parseHailStone(it) }
+  private fun solveWithZ3(hailStones: List<HailStone>): Long {
     val context = Context(mapOf("proof" to "true", "model" to "true"))
     val solver = context.mkSolver()
     val x = context.mkIntConst("x")
