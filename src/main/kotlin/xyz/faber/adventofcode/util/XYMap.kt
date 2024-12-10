@@ -243,10 +243,14 @@ data class MapEntry<T>(val pos: Pos, val value: T)
 fun <T> List<T>.toXYMap(dimx: Int, dimy: Int): XYMap<T> = XYMap(dimx, dimy, this)
 
 fun List<String>.toXYMap(): CharXYMap {
+    return this.toXYMap(null, false)
+}
+
+fun List<String>.toXYMap(default: Char?, autoexpand: Boolean): CharXYMap {
     if (this.any { it.length != this[0].length }) {
         throw IllegalArgumentException("Lines are not same length")
     }
-    return CharXYMap(this[0].length, this.size, this.joinToString("").toCharArray().toList())
+    return CharXYMap(this[0].length, this.size, this.joinToString("").toCharArray().toList(), default, autoexpand)
 }
 
 fun <T> List<String>.toXYMap(transform: (Char) -> T, default: T): XYMap<T> {

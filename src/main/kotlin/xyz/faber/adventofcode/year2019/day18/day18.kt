@@ -53,7 +53,7 @@ class Day18 {
                     when (e.to) {
                         '@', in '0'..'3' -> res.add(Edge(state, State(state.pos.setAt(i, e.to), state.keys), e.cost))
                         in 'a'..'z' -> res.add(Edge(state, State(state.pos.setAt(i, e.to), state.keys + e.to), e.cost))
-                        in 'A'..'Z' -> if (e.to.toLowerCase() in state.keys) {
+                        in 'A'..'Z' -> if (e.to.lowercaseChar() in state.keys) {
                             res.add(Edge(state, State(state.pos.setAt(i, e.to), state.keys), e.cost))
                         }
                     }

@@ -1,7 +1,7 @@
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 plugins {
-  kotlin("jvm") version "1.9.21"
+  kotlin("jvm") version "2.1.0"
 }
 
 repositories {
@@ -10,9 +10,9 @@ repositories {
 }
 
 dependencies {
-  implementation("org.jetbrains.kotlin:kotlin-stdlib:1.9.21")
-  implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.7.3")
-  implementation("org.jetbrains.kotlin:kotlin-reflect:1.9.21")
+  implementation("org.jetbrains.kotlin:kotlin-stdlib:2.1.0")
+  implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.9.0")
+  implementation("org.jetbrains.kotlin:kotlin-reflect:2.1.0")
   implementation("org.jetbrains.kotlinx:kotlinx-serialization-json-jvm:1.6.1")
   implementation("io.github.microutils:kotlin-logging:1.6.20")
   implementation("com.google.guava:guava:32.1.3-jre")
@@ -38,8 +38,9 @@ dependencies {
   implementation("guru.nidi:graphviz-kotlin:0.18.1")
   implementation("org.jetbrains.kotlinx:multik-core:0.2.2")
   implementation("org.jetbrains.kotlinx:multik-default:0.2.2")
+  implementation("org.thymeleaf:thymeleaf:3.1.1.RELEASE")
 }
 
 kotlin { // Extension for easy setup
-  jvmToolchain(17) // Target version of generated JVM bytecode. See 7️⃣
+  jvmToolchain(21) // Target version of generated JVM bytecode. See 7️⃣
 }

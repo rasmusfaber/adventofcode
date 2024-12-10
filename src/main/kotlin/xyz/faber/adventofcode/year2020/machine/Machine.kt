@@ -1,5 +1,7 @@
 package xyz.faber.adventofcode.year2020.machine
 
+import java.util.*
+
 class Machine(val program: List<Ins>) {
     var ip = 0
     var acc = 0
@@ -37,4 +39,4 @@ enum class Op {
 
 fun parseProgram(lines: List<String>) = lines.map { parseLine(it) }
 
-fun parseLine(line: String) = line.split(" ").let { Ins(Op.valueOf(it[0].toUpperCase()), it[1].toInt()) }
+fun parseLine(line: String) = line.split(" ").let { Ins(Op.valueOf(it[0].uppercase(Locale.getDefault())), it[1].toInt()) }

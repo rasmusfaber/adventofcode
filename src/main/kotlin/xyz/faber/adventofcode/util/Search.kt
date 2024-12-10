@@ -15,6 +15,15 @@ fun <P> Map<P, List<P>>.toDirectedGraph(): DirectedGraph<P> {
   }
 }
 
+fun <P> List<Edge<P>>.toDirectedGraph(): DirectedGraph<P> {
+  val map = this.groupBy { it.from }
+  return object : DirectedGraph<P> {
+    override fun getNeighbours(pos: P): Collection<P> {
+      return map[pos]?.map { it.to } ?: emptyList()
+    }
+  }
+}
+
 fun <T> XYMap<T>.toDirectedGraph(isOpen: (T) -> Boolean): DirectedGraph<Pos> {
   val self = this
   return object : DirectedGraph<Pos> {
