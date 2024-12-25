@@ -91,3 +91,32 @@ fun commonPeriod(a: Pair<Long, Long>, b: Pair<Long, Long>): Pair<Long, Long> {
 }
 
 fun commonPeriod(vararg pairs: Pair<Long, Long>) = pairs.reduce { a, b -> commonPeriod(a, b) }
+
+fun solveLinearDiophantine(a: Int, b: Int, c: Int): Pair<Pair<Int, Int>, Pair<Int, Int>>? {
+    val (d, x, y) = gcdExtended(a, b)
+    if (c % d != 0) {
+        return null
+    }
+    val k = c / d
+    return ((x * k to b/d) to (y * k to -a/d))
+}
+
+fun solveSimultaneousDiophantine(
+    a1: Int, b1: Int, c1: Int,
+    a2: Int, b2: Int, c2: Int
+): Pair<Int, Int>? {
+    // TODO
+    // Solve each equation
+    val eq1 = solveLinearDiophantine(a1, b1, c1) ?: return null
+    val eq2 = solveLinearDiophantine(a2, b2, c2) ?: return null
+
+    val gcd = gcdExtended(a1 * b2 - a2 * b1, b1 * b2).first
+    if ((c2 - c1) % gcd != 0) return null // No solution
+
+    val tCommon = solveLinearDiophantine(a1 * b2 - a2 * b1, b1 * b2, c2 - c1)?.first?.first ?: return null
+
+    // Substitute tCommon back to get x and y
+    val x = eq1.first.first + eq1.first.second * tCommon
+    val y = eq1.second.first + eq1.second.second * tCommon
+    return x to y
+}

@@ -66,6 +66,24 @@ fun <P> DirectedGraph<P>.toDirectedWeightedGraph(costFunc: (P, P) -> Int): Direc
   }
 }
 
+fun <P> DirectedWeightedGraph<P>.reversed(nodes: Collection<P>): DirectedWeightedGraph<P> {
+  val reversedAdj = mutableMapOf<P, MutableList<Edge<P>>>()
+  for (node in nodes) {
+    reversedAdj[node] = mutableListOf()
+  }
+  for (node in nodes) {
+    for (edge in this.getNeighbours(node)) {
+      reversedAdj[edge.to]?.add(Edge(edge.to, node, edge.cost))
+    }
+  }
+
+  return object : DirectedWeightedGraph<P> {
+    override fun getNeighbours(pos: P): Collection<Edge<P>> {
+      return reversedAdj[pos] ?: emptyList()
+    }
+  }
+}
+
 fun <P> bfs(graph: DirectedGraph<P>, start: P): Sequence<P> = sequence {
   val visited = mutableSetOf<P>()
   val queue = LinkedList<P>()
@@ -206,17 +224,22 @@ class DirectedWeightedGraphWithExtraConnections<P>(
 
 fun <P> dijkstra(graph: DirectedWeightedGraph<P>, start: P): Map<P, Edge<P>> {
   val (shortestEdges, _) = dijkstraImpl(graph, start, null)
-  return shortestEdges
+  return shortestEdges.mapValues { it.value.first }
+}
+
+fun <P> dijkstraDistances(graph: DirectedWeightedGraph<P>, start: P): Map<P, Int> {
+  val (shortestEdges, _) = dijkstraImpl(graph, start, null)
+  return shortestEdges.mapValues { it.value.second } + (start to 0)
 }
 
 fun <P> dijkstra(graph: DirectedWeightedGraph<P>, start: P, goal: P): PathSolution<P>? {
   val (shortestEdges, _) = dijkstraImpl(graph, start) { it == goal }
-  return pathAndTotalCost(shortestEdges, start, goal)
+  return pathAndTotalCost(shortestEdges.mapValues { it.value.first }, start, goal)
 }
 
 fun <P> dijkstraPredicate(graph: DirectedWeightedGraph<P>, start: P, isGoal: ((P) -> Boolean)): PathSolution<P>? {
   val (shortestEdges, goal) = dijkstraImpl(graph, start, isGoal)
-  return if (goal != null) pathAndTotalCost(shortestEdges, start, goal) else null
+  return if (goal != null) pathAndTotalCost(shortestEdges.mapValues { it.value.first }, start, goal) else null
 }
 
 data class Edge<P>(val from: P, val to: P, val cost: Int, val label: String?) {
@@ -246,9 +269,9 @@ private fun <P> dijkstraImpl(
   graph: DirectedWeightedGraph<P>,
   start: P,
   isGoal: ((P) -> Boolean)?
-): Pair<Map<P, Edge<P>>, P?> {
+): Pair<Map<P, Pair<Edge<P>, Int>>, P?> {
   val distances = mutableMapOf(start to 0)
-  val shortestEdges = mutableMapOf<P, Edge<P>>()
+  val shortestEdges = mutableMapOf<P, Pair<Edge<P>, Int>>()
   val queue = HeapPriorityQueue<P>()
   queue.add(start, 0)
   while (queue.isNotEmpty()) {
@@ -257,9 +280,11 @@ private fun <P> dijkstraImpl(
       return shortestEdges to from
     }
     for (edge in graph.getNeighbours(from)) {
-      if (distances[edge.to] ?: Int.MAX_VALUE > distances[from]!! + edge.cost) {
+      val currentDist = distances[from]!!
+      val newDist = currentDist + edge.cost
+      if (newDist < (distances[edge.to] ?: Int.MAX_VALUE)) {
         distances[edge.to] = distances[from]!! + edge.cost
-        shortestEdges[edge.to] = edge
+        shortestEdges[edge.to] = edge to newDist
         queue.addOrUpdate(edge.to, distances[from]!! + edge.cost)
       }
     }
@@ -267,7 +292,7 @@ private fun <P> dijkstraImpl(
   return shortestEdges to null
 }
 
-private fun <P> pathAndTotalCost(shortestEdges: Map<P, Edge<P>>, start: P, goal: P): PathSolution<P>? {
+fun <P> pathAndTotalCost(shortestEdges: Map<P, Edge<P>>, start: P, goal: P): PathSolution<P>? {
   val path = mutableListOf<Edge<P>>()
   var c = goal
   while (c != start) {

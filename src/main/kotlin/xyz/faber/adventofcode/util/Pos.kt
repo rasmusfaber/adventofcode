@@ -32,6 +32,19 @@ data class Pos(val x: Int, val y: Int) {
 
     }
 
+    fun atMostManhattanDistanceAway(dist: Int): List<Pos> {
+        val result = mutableListOf<Pos>()
+        for (i in -dist..dist) {
+            for (j in -dist + abs(i)..dist - abs(i)) {
+                if (!(i == 0 && j == 0)) {
+                    result.add(Pos(x + i, y + j))
+                }
+            }
+        }
+        return result
+
+    }
+
 
     operator fun plus(direction: Direction): Pos = move(direction)
 

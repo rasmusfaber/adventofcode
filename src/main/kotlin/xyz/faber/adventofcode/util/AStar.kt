@@ -43,7 +43,7 @@ fun <P> aStarPredicate(neighbours: (P)->Collection<Edge<P>>, heuristicToEnd: (P)
 
         // Check if we have reached the end
         if (isGoal(currentPos)) {
-            println("${closedVertices.size} closed, ${openVertices.size} open")
+            //println("${closedVertices.size} closed, ${openVertices.size} open")
             // Backtrack to generate the most efficient path
             return generatePath(currentPos, cameFrom)
         }

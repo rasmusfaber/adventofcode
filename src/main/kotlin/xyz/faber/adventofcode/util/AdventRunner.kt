@@ -17,11 +17,13 @@ class AdventRunner<T>(val year: Int, val day: Int, val solution: BaseAdventSolut
     println("Test data:")
     tests.withIndex().forEach { (i, test) ->
       try {
+        solution.testdata = true
         run(solution, test, ignoreExceptions = true)
       } catch (e: Exception) {
       }
     }
     println("Real data:")
+    solution.testdata = false
     run(solution, input)
   }
 
@@ -159,9 +161,11 @@ class AdventRunner<T>(val year: Int, val day: Int, val solution: BaseAdventSolut
   }
 }
 
-sealed interface BaseAdventSolution<T>
+sealed class BaseAdventSolution<T> {
+  var testdata = false
+}
 
-abstract class AdventSolution<T> : BaseAdventSolution<T> {
+abstract class AdventSolution<T> : BaseAdventSolution<T>() {
   open fun transform(input: String) = input
 
   open fun transform(input: List<String>) = input
@@ -207,7 +211,7 @@ abstract class AdventSolution<T> : BaseAdventSolution<T> {
   }
 }
 
-abstract class AdventSolutionWithTransform<T, I> : BaseAdventSolution<T> {
+abstract class AdventSolutionWithTransform<T, I> : BaseAdventSolution<T>() {
   open fun transformLine(input: String): I? {
     return null
   }

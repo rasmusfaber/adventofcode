@@ -72,10 +72,20 @@ enum class Direction {
 
 fun String.toDirection(): Direction {
   return when (this) {
-    "N", "U" -> Direction.N
-    "E", "R" -> Direction.E
-    "S", "D" -> Direction.S
-    "W", "L" -> Direction.W
+    "N", "U", "^" -> Direction.N
+    "E", "R", ">" -> Direction.E
+    "S", "D", "v" -> Direction.S
+    "W", "L", "<" -> Direction.W
+    else -> throw IllegalArgumentException("Unknown direction: $this")
+  }
+}
+
+fun Char.toDirection(): Direction {
+  return when (this) {
+    'N', 'U', '^' -> Direction.N
+    'E', 'R', '>' -> Direction.E
+    'S', 'D', 'v' -> Direction.S
+    'W', 'L', '<' -> Direction.W
     else -> throw IllegalArgumentException("Unknown direction: $this")
   }
 }
